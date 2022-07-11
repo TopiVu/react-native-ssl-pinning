@@ -115,7 +115,7 @@ public class OkHttpUtils {
 
     }
 
-  public static OkHttpClient getUnsafeOkHttpClient() {
+  public static OkHttpClient getUnsafeOkHttpClient(ReadableMap options) {
     try {
       // Create a trust manager that does not validate certificate chains
       final TrustManager[] trustAllCerts = new TrustManager[] {
@@ -151,6 +151,14 @@ public class OkHttpUtils {
       });
 
       OkHttpClient okHttpClient = builder.build();
+       if (options.hasKey("timeoutInterval")) {
+        int timeout = options.getInt("timeoutInterval");
+        okHttpClient = okHttpClient.newBuilder()
+                .readTimeout(timeout, TimeUnit.MILLISECONDS)
+                .writeTimeout(timeout, TimeUnit.MILLISECONDS)
+                .connectTimeout(timeout, TimeUnit.MILLISECONDS)
+                .build();
+      }
       return okHttpClient;
     } catch (Exception e) {
       throw new RuntimeException(e);
